@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snake</title>
+<style>
+    /* ============ Reset y base ============ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(16px, 4vw, 32px);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      background: #f8fafc;
+      line-height: 1.5;
+    }
+
+  /* ============ Encabezado ============ */
+  header h1 {
+    font-size: clamp(2.5rem, 8vw, 3.75rem);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #0f172a;
+    text-shadow: none;
+    margin-bottom: 1em;
+  }
+
+  /* ============ Puntuación (HUD) ============ */
+  .hud {
+    display: flex;
+    gap: clamp(20px, 6vw, 48px);
+    margin: 0 auto clamp(20px, 5vh, 40px);
+    font-variant-numeric: tabular-nums;
+    user-select: none;
+  }
+
+  .hud > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.2;
+  }
+
+  .hud .label {
+    color: #475569;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  .hud .value {
+    color: #0f172a;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 3.2vw, 1.35rem);
+  }
+
+  .hud .best .value {
+    color: #334155;
+    font-weight: 700;
+    font-size: clamp(1.25rem, 3.6vw, 1.55rem);
+  }
+
+  /* ============ Tablero centralizado ============ */
+  .board-wrap {
+    position: relative;
+    padding: clamp(12px, 3vw, 20px);
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+    margin: 0 auto clamp(16px, 4vh, 32px);
+  }
+
+  canvas#gameCanvas {
+    display: block;
+    border-radius: 8px;
+    max-width: min(420px, 90vw);
+    height: auto;
+    image-rendering: pixelated;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+  }
+
+  /* ============ Overlays (inicio / Game Over) ============ */
+  .overlay {
+    position: absolute;
+    inset: clamp(16px, 4vw, 32px);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(12px, 4vw, 24px);
+    padding: clamp(20px, 5vw, 32px);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 5;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .overlay.hidden { display: none; }
+
+  .overlay h2 {
+    font-size: clamp(2rem, 7vw, 2.75rem);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #0f172a;
+  }
+
+  .overlay p { color: #475569; font-size: clamp(0.85rem, 2.6vw, 1.1rem); }
+
+  .stat-line {
+    display: flex;
+    gap: clamp(20px, 5vw, 40px);
+    font-size: clamp(0.95rem, 3vw, 1.15rem);
+    color: #0f172a;
+  }
+
+  .stat-line b { color: #0f172a; }
+  .stat-line i { color: #475569; font-style: normal; font-weight: 700; }
+
+  /* Botón principal */
+  .btn {
+    cursor: pointer;
+    padding: clamp(10px, 3vw, 16px) clamp(28px, 6vw, 44px);
+    font-size: clamp(0.95rem, 2.8vw, 1.1rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: #0f172a;
+    border: 2px solid #0f172a;
+    border-radius: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.25);
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.32);
+  }
+
+  .btn:active { transform: translateY(0); }
+
+  /* ============ Pista inferior ============ */
+  footer {
+    margin-top: clamp(20px, 5vh, 32px);
+    color: #475569;
+    font-size: clamp(0.72rem, 2.2vw, 0.9rem);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  footer kbd {
+    display: inline-block;
+    padding: 2px 8px;
+    margin: 0 2px;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #0f172a;
+    font-family: inherit;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Snake</h1>
+</header>
+
+<div class="hud">
+  <div><span class="label">Score</span><span class="value" id="score">0</span></div>
+  <div><span class="label">Best</span><span class="value best" id="highScore">0</span></div>
+</div>
+
+<div class="board-wrap">
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+  <!-- Pantalla de inicio -->
+  <div class="overlay" id="startOverlay">
+    <h2>Snake</h2>
+    <p>Come la comida y evita las paredes y tu propio cuerpo.</p>
+    <p>Usa <kbd>&uarr;</kbd> <kbd>&darr;</kbd> <kbd>&larr;</kbd> <kbd>&rarr;</kbd></p>
+    <button class="btn" id="startBtn">Iniciar Juego</button>
+  </div>
+
+  <!-- Pantalla de Game Over -->
+  <div class="overlay hidden" id="gameOverOverlay">
+    <h2>Game Over</h2>
+    <div class="stat-line">
+      <span>Score: <b id="finalScore">0</b></span>
+      <span>Record: <i id="newHighText">—</i></span>
+    </div>
+    <button class="btn" id="restartBtn">Jugar de nuevo</button>
+  </div>
+</div>
+
+<footer>Usa las <kbd>flechas del teclado</kbd> para controlar tu serpiente</footer>
+
+<script>
+'use strict';
+
+/* =========================================================
+ * CONSTANTES globales
+ * ====================================================== */
+const GRID_SIZE = 20;      // 20x20 celdas del tablero
+const CELL_SIZE = 20;      // 20px por celda -> 400x400 px de canvas
+const TICK_MS = 120;       // velocidad de movimiento (~8.3 ticks/segundo)
+const STORAGE_KEY = 'snake_high_score';
+
+const DIRECTIONS = {
+  UP:     { x: 0, y: -1 },
+  DOWN:   { x: 0, y: 1 },
+  LEFT:   { x: -1, y: 0 },
+  RIGHT:  { x: 1, y: 0 }
+};
+
+const KEY_MAP = {
+  ArrowUp:     DIRECTIONS.UP,
+  ArrowDown:   DIRECTIONS.DOWN,
+  ArrowLeft:   DIRECTIONS.LEFT,
+  ArrowRight:  DIRECTIONS.RIGHT,
+  KeyW:        DIRECTIONS.UP,
+  KeyS:        DIRECTIONS.DOWN,
+  KeyA:        DIRECTIONS.LEFT,
+  KeyD:        DIRECTIONS.RIGHT
+};
+
+const COLORS = {
+  background: '#f8fafc',
+  grid:       '#e2e8f0',
+  snakeHead:  '#0f172a',
+  snakeBody:  '#334155',
+  snakeBodyAlt: '#475569',
+  food:       '#475569',
+  foodGlow:   '#cbd5e1'
+};
+
+const GAME_STATES = { MENU: 'menu', PLAYING: 'playing', GAMEOVER: 'gameover' };
+
+/* =========================================================
+ * SISTEMA DE ENTRADA (teclado)
+ * Flechas + WASD, bloqueo de giro 180°, cola de dirección
+ * ====================================================== */
+let pendingDirection = null;
+
+window.addEventListener('keydown', (event) => {
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+    event.preventDefault(); // evitar scroll con flechas
+  }
+  const dir = KEY_MAP[event.code] || KEY_MAP[event.key];
+  if (!dir) return;
+  pendingDirection = dir; // cola pendiente de procesamiento por tick
+});
+
+function processDirection(current) {
+  if (!pendingDirection) return current;
+  const next = pendingDirection;
+  pendingDirection = null;
+  // Bloquear giro contrario al movimiento actual (evita autocolisión instantánea)
+  if (current.x !== 0 && next.x === -current.x) return current;
+  if (current.y !== 0 && next.y === -current.y) return current;
+  return next;
+}
+
+/* =========================================================
+ * ESTADO DEL JUEGO
+ * ====================================================== */
+const state = {
+  state: GAME_STATES.MENU,
+  snake: [],
+  direction: { x: 0, y: 0 },
+  nextDirection: { x: 0, y: 0 },
+  food: { x: 0, y: 0 },
+  score: 0,
+  highScore: 0,
+  gameOver: false
+};
+
+function resetState() {
+  state.state = GAME_STATES.MENU;
+  state.snake = [];
+  state.direction = { x: 0, y: 0 };
+  state.nextDirection = { x: 0, y: 0 };
+  state.score = 0;
+  state.gameOver = false;
+}
+
+function startGame() {
+  const sx = Math.floor(GRID_SIZE / 2);
+  const sy = Math.floor(GRID_SIZE / 2);
+  state.snake = [
+    { x: sx, y: sy },
+    { x: sx - 1, y: sy },
+    { x: sx - 2, y: sy }
+  ];
+  state.direction = { x: 1, y: 0 };
+  state.nextDirection = { x: 1, y: 0 };
+  state.score = 0;
+  state.gameOver = false;
+  state.state = GAME_STATES.PLAYING;
+  spawnFood();
+}
+
+function spawnFood() {
+  let valid = false;
+  while (!valid) {
+    state.food = {
+      x: Math.floor(Math.random() * GRID_SIZE),
+      y: Math.floor(Math.random() * GRID_SIZE)
+    };
+    valid = !state.snake.some(segment => segment.x === state.food.x && segment.y === state.food.y);
+  }
+}
+
+function tick() {
+  if (state.state !== GAME_STATES.PLAYING) return;
+
+  state.direction = processDirection(state.direction);
+
+  const head = { ...state.snake[0] };
+  head.x += state.direction.x;
+  head.y += state.direction.y;
+
+  if (head.x === state.food.x && head.y === state.food.y) {
+    // Comer: crecer y sumar puntos
+    state.snake.unshift(head);
+    state.score += 10;
+    spawnFood();
+  } else {
+    state.snake.unshift(head);
+    state.snake.pop(); // mover la cola
+  }
+}
+
+/* =========================================================
+ * DETECCIÓN DE COLISIONES (paredes + cuerpo)
+ * ====================================================== */
+function checkWallCollision(head) {
+  return head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE;
+}
+
+function checkSelfCollision(snake) {
+  const head = snake[0];
+  for (let i = 1; i < snake.length; i++) {
+    if (head.x === snake[i].x && head.y === snake[i].y) return true;
+  }
+  return false;
+}
+
+function checkCollision() {
+  const head = state.snake[0];
+  return checkWallCollision(head) || checkSelfCollision(state.snake);
+}
+
+/* =========================================================
+ * RENDERIZADO: fondo, grid, comida, serpiente
+ * ====================================================== */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+function drawBackground() {
+  ctx.fillStyle = COLORS.background;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  drawGrid();
+  drawFood();
+  drawSnake();
+}
+
+function drawGrid() {
+  ctx.strokeStyle = COLORS.grid;
+  ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  for (let i = 0; i <= GRID_SIZE; i++) {
+    ctx.moveTo(i * CELL_SIZE, 0);
+    ctx.lineTo(i * CELL_SIZE, canvas.height);
+    ctx.moveTo(0, i * CELL_SIZE);
+    ctx.lineTo(canvas.width, i * CELL_SIZE);
+  }
+  ctx.stroke();
+}
+
+function drawFood() {
+  const cx = state.food.x * CELL_SIZE + CELL_SIZE / 2;
+  const cy = state.food.y * CELL_SIZE + CELL_SIZE / 2;
+  ctx.save();
+  ctx.shadowColor = COLORS.foodGlow;
+  ctx.shadowBlur = 14;
+  ctx.fillStyle = COLORS.food;
+  ctx.beginPath();
+  ctx.arc(cx, cy, CELL_SIZE / 2 - 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawSnake() {
+  state.snake.forEach((segment, index) => {
+    const isHead = index === 0;
+    ctx.fillStyle = isHead ? COLORS.snakeHead : (index % 2 === 0 ? COLORS.snakeBody : COLORS.snakeBodyAlt);
+    const x = segment.x * CELL_SIZE + 2;
+    const y = segment.y * CELL_SIZE + 2;
+    const size = CELL_SIZE - 4;
+
+    if (isHead) {
+      ctx.shadowColor = COLORS.snakeHead;
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.roundRect(x, y, size, size, 5);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    } else {
+      ctx.fillRect(x, y, size, size);
+    }
+  });
+}
+
+function render() {
+  drawBackground();
+  document.getElementById('score').textContent = state.score;
+}
+
+/* =========================================================
+ * ALMACENAMIENTO LOCAL: High Score (localStorage)
+ * ====================================================== */
+function loadHighScore() {
+  try {
+    const stored = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+    return Number.isNaN(stored) ? 0 : stored;
+  } catch (error) {
+    console.error('Error al leer high score:', error.message);
+    return 0;
+  }
+}
+
+function saveHighScore(score) {
+  try {
+    const current = loadHighScore();
+    if (score > current) {
+      localStorage.setItem(STORAGE_KEY, String(score));
+      return score;
+    }
+    return current;
+  } catch (error) {
+    console.error('Error al guardar high score:', error.message);
+    return loadHighScore();
+  }
+}
+
+/* =========================================================
+ * MOTOR PRINCIPAL: requestAnimationFrame + acumulador delta-time
+ * ====================================================== */
+let lastTime = 0;
+let accumulator = 0;
+let running = false;
+let rafId = null;
+
+function gameLoop(timestamp) {
+  if (!running) return;
+  const delta = timestamp - lastTime;
+  lastTime = timestamp;
+  accumulator += delta;
+
+  while (accumulator >= TICK_MS) {
+    tick();
+    if (checkCollision()) {
+      handleGameOver();
+      running = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      return;
+    }
+    accumulator -= TICK_MS;
+  }
+
+  render();
+  rafId = requestAnimationFrame(gameLoop);
+}
+
+/* =========================================================
+ * FLUJO DE UI: botones, overlays, inicio y Game Over
+ * ====================================================== */
+const startOverlay   = document.getElementById('startOverlay');
+const gameOverOverlay = document.getElementById('gameOverOverlay');
+const startBtn       = document.getElementById('startBtn');
+const restartBtn     = document.getElementById('restartBtn');
+const scoreEl        = document.getElementById('score');
+const highScoreEl    = document.getElementById('highScore');
+const finalScoreEl   = document.getElementById('finalScore');
+const newHighText    = document.getElementById('newHighText');
+
+highScoreEl.textContent = state.highScore;
+
+startBtn.addEventListener('click', () => beginGame());
+restartBtn.addEventListener('click', () => beginGame());
+
+function beginGame() {
+  startOverlay.classList.add('hidden');
+  gameOverOverlay.classList.add('hidden');
+  state.highScore = loadHighScore();
+  highScoreEl.textContent = state.highScore;
+  startGame();
+  render();
+
+  running = true;
+  lastTime = performance.now();
+  accumulator = 0;
+  rafId = requestAnimationFrame(gameLoop);
+}
+
+function handleGameOver() {
+  state.state = GAME_STATES.GAMEOVER;
+
+  const newHigh = saveHighScore(state.score);
+  const isRecord = newHigh === state.score && state.score > 0;
+
+  document.getElementById('finalScore').textContent = state.score;
+  newHighText.textContent = isRecord ? '¡Nuevo récord! ' + newHigh : newHigh;
+  highScoreEl.textContent = newHigh;
+
+  gameOverOverlay.classList.remove('hidden');
+}
+
+// Dibujo inicial de fondo (menu estático)
+render();
+</script>
+</body>
+</html>

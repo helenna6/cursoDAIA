@@ -1,0 +1,180 @@
+/* ============ Componente de login — CSS puro (skill diseno-web) ============ */
+:root {
+  --color-bg: #ffffff;
+  --color-surface: #f8fafc;
+  --color-text: #1e293b;
+  --color-text-secondary: #475569;
+  --color-border: #e2e8f0;
+  --color-primary: #0f172a;
+  --color-primary-hover: #1e293b;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fef2f2;
+  --font-sans: Arial, Helvetica, sans-serif;
+  --radius: 8px;
+  --spacing: 16px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 4vw, 32px);
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-surface);
+  line-height: 1.5;
+}
+
+.login-page {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-card {
+  padding: var(--spacing);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+}
+
+.login-card h2 {
+  font-size: clamp(1.5rem, 4vw, 1.75rem);
+  margin-bottom: var(--spacing);
+  color: #0f172a;
+}
+
+.login-field {
+  margin-bottom: var(--spacing);
+}
+
+.login-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.login-field input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.login-field input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.btn-toggle-password {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.btn-toggle-password:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.login-message {
+  margin-bottom: var(--spacing);
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  font-size: 0.875rem;
+  border: 1px solid #fecaca;
+}
+
+.login-message[hidden] { display: none; }
+
+.btn-group {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing);
+}
+
+.btn-login {
+  width: auto;
+  max-width: 220px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.btn-login:hover {
+  filter: brightness(1.1);
+}
+
+.btn-login:active {
+  transform: translateY(0);
+}
+
+.btn-login:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-close {
+  margin-top: 10px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.btn-close:hover {
+  background: var(--color-surface);
+}
+
+.btn-login-open {
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.btn-login-open:hover {
+  filter: brightness(1.1);
+}
+
+@media (max-width: 480px) {
+  body { padding: 16px; }
+  .login-card { padding: 20px; }
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prueba - Lista de Skills en IA</title>
+  <style>
+    :root {
+      --bg-dark: #1e1e1e;
+      --text-white: #ffffff;
+      --electric-blue: #0066ff;
+      --neon-cyan: #00ffff;
+      --font-sans: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 32px;
+    }
+
+    h1 {
+      font-weight: bold;
+      color: var(--electric-blue);
+      margin: 0 0 16px 0;
+      font-size: 2rem;
+    }
+
+    .intro {
+      font-size: 1rem;
+      opacity: 0.9;
+      margin-bottom: 24px;
+    }
+
+    ul.skills-list {
+      list-style-type: disc;
+      padding-left: 24px;
+      margin: 0;
+    }
+
+    ul.skills-list li {
+      margin-bottom: 14px;
+      padding: 10px 14px;
+      border-left: 3px solid transparent;
+      transition: border-left-color 0.2s ease, background 0.2s ease;
+    }
+
+    ul.skills-list li:hover {
+      background: rgba(0, 102, 255, 0.08);
+      border-left-color: var(--electric-blue);
+    }
+
+    a {
+      color: var(--neon-cyan);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    a:hover {
+      color: var(--electric-blue);
+      text-decoration: underline;
+    }
+
+    .description {
+      color: #b0b0b0;
+      margin-left: 10px;
+      font-size: 0.95em;
+    }
+
+    footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #333;
+      font-size: 0.85rem;
+      opacity: 0.6;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Skills en IA &#8212; Webs abiertos</h1>
+      <p class="intro">Recursos open-source y plataformas dedicadas al desarrollo de habilidades en inteligencia artificial y web moderno.</p>
+    </header>
+
+    <section aria-label="Lista de recursos en IA">
+      <ul class="skills-list">
+        <li><a href="https://vercel.com" target="_blank" rel="noopener noreferrer">Vercel</a><span class="description">&#8212; Hosting y herramientas para sitios web, incluyendo skills JS y IA frontend</span></li>
+        <li><a href="https://www.nvidia.com" target="_blank" rel="noopener noreferrer">NVIDIA AI Labs</a><span class="description">&#8212; Herramientas y investigación open-source en ML/IA</span></li>
+        <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a><span class="description">&#8212; Repositorio con miles de librerías Open Source en IA y web</span></li>
+        <li><a href="https://huggingface.co" target="_blank" rel="noopener noreferrer">Hugging Face</a><span class="description">&#8212; Datasets y modelos de IA (transformers, LLMs) Open Source</span></li>
+        <li><a href="https://docs.anthropic.com" target="_blank" rel="noopener noreferrer">Anthropic Claude Docs</a><span class="description">&#8212; Documentación sobre modelos de lenguaje IA</span></li>
+        <li><a href="https://www.unrealengine.com" target="_blank" rel="noopener noreferrer">Unreal Engine</a><span class="description">&#8212; Motor gráfico 3D con plugins de IA</span></li>
+        <li><a href="https://edge.org" target="_blank" rel="noopener noreferrer">Edge.org</a><span class="description">&#8212; Entornos y infraestructuras para desarrollo web</span></li>
+        <li><a href="https://opensource.google" target="_blank" rel="noopener noreferrer">Open Source Google</a><span class="description">&#8212; Documentación de proyectos abiertos</span></li>
+        <li><a href="https://dify.ai" target="_blank" rel="noopener noreferrer">Dify</a><span class="description">&#8212; Plataforma open source de aplicaciones IA con prompts YAGI</span></li>
+        <li><a href="https://langchain.com" target="_blank" rel="noopener noreferrer">LangChain</a><span class="description">&#8212; Toolkits para crear agentes de IA</span></li>
+      </ul>
+    </section>
+
+    <footer>
+      &copy; 2026 &#8212; Recursos open-source de IA y desarrollo web
+    </footer>
+  </div>
+</body>
+</html>
